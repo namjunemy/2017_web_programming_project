@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>한밭대 Tasty Road</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800'
+          rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic'
+          rel='stylesheet' type='text/css'>
+
+    <!-- Plugin CSS -->
+    <link href="/vendor/magnific-popup/magnific-popup.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="/css/creative.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript"
+            src="//apis.daum.net/maps/maps3.js?apikey=84cca4aaded10627eecf5c7494ffd61d"></script>
+
+</head>
+
+<body id="page-top">
+
+<nav id="mainNav" class="navbar navbar-default navbar-fixed-top"
+     style="background-color: lightgray">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/main">Shakespeare</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <form onsubmit="return false" class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    <select class="form-control" name="selectOne" id="selectOne">
+                        <option value="전체">전체</option>
+                        <option value="한식">한식</option>
+                        <option value="분식">분식</option>
+                        <option value="일식">일식</option>
+                        <option value="양식">양식</option>
+                    </select>
+                </div>
+                <button type="button" onclick="moveTo(selectOne.value)"
+                        class="btn btn-default margin-right">
+                    선택
+                </button>
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Search" name="searchValue">
+                </div>
+                <button type="button" onclick="moveTo(searchValue.value)" class="btn btn-default">
+                    검색
+                </button>
+                <button type="button" onclick="setNull()" class="btn btn-default margin-right">
+                    Reset
+                </button>
+                <button type="button" onclick="randomSelect()" class="btn btn-info">
+                    Random
+                </button>
+                <button type="button" onclick="javascript:location.href='/api/board/boardAll'"
+                        class="btn btn-warning">
+                    Review
+                </button>
+            </form>
+            <form onsubmit="return false" class="navbar-form navbar-right" role="search">
+                <button type="button" onclick="javascript:location.href='/'" class="btn btn-danger">
+                    LogOut
+                </button>
+            </form>
+        </div><!--/.navbar-collapse -->
+    </div>
+</nav>
+
+<header>
+    <div id="map" style="width:100%;height:900px;"></div>
+    <script>
+      var container = document.getElementById('map');
+      var options = {
+        center: new daum.maps.LatLng(36.3492494, 127.2987662),
+        level: 2
+      };
+
+      var map = new daum.maps.Map(container, options);
+      map.setZoomable(false);
+    </script>
+</header>
+
+
+<section>
+    <div align="center">
+        <img src="img/title.PNG" alt="" width="50%" height="auto">
+    </div>
+</section>
+
+<section style="background-color: lightgray" id="contact">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 text-center">
+                <h2 class="section-heading">Let's Get In Touch!</h2>
+                <hr class="light">
+                <p>대전광역시 유성구 동서대로 125 국립 한밭대학교</p>
+            </div>
+            <div class="col-lg-4 col-lg-offset-2 text-center">
+                <i class="fa fa-phone fa-3x sr-contact"></i>
+                <p>042)821-1114</p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <i class="fa fa-envelope-o fa-3x sr-contact"></i>
+                <p><a href="mailto:contact@wisoft.io" style="color: white;">contact@wisoft.io</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  let markers = [];
+  let infoWindows = [];
+
+  let array_of_functions = [
+    gorae,bongus,mong,maru,hwang,oddugi,bongs,hakata,sushi,bonita,thecook,salt
+  ];
+
+  function randomSelect() {
+    let value = Math.floor((Math.random() * 12));
+    setNull();
+    array_of_functions[value]();
+  }
+
+  function moveTo(data) {
+    setNull();
+    if (data === '고래떡볶이') {
+      gorae();
+    } else if (data === '봉구스밥버거') {
+      bongus()
+    } else if (data === '몽떡') {
+      mong();
+    } else if (data === '마루') {
+      maru();
+    } else if (data === '황돈이') {
+      hwang();
+    } else if (data === '오뚜기식당') {
+      oddugi();
+    } else if (data === '봉스키친') {
+      bongs();
+    } else if (data === '하카타') {
+      hakata();
+    } else if (data === '스시킴') {
+      sushi();
+    } else if (data === '보니타') {
+      bonita();
+    } else if (data === '더쿡') {
+      thecook();
+    } else if (data === '솔트앤페퍼') {
+      salt();
+    } else if (data === '분식') {
+      gorae();
+      bongus();
+      mong();
+    } else if (data === '한식') {
+      maru();
+      hwang();
+      oddugi();
+    } else if (data === '일식') {
+      bongs();
+      hakata();
+      sushi();
+    } else if (data === '양식') {
+      bonita();
+      thecook();
+      salt();
+    } else if (data === '전체') {
+      gorae();
+      bongus();
+      mong();
+      maru();
+      hwang();
+      oddugi();
+      bongs();
+      hakata();
+      sushi();
+      bonita();
+      thecook();
+      salt();
+    }
+  }
+
+  function maru() {
+    let markerPosition = new daum.maps.LatLng(36.349036, 127.298922);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '마루  ' +
+            '<a href="/api/menus/menu?name=마루" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function hwang() {
+    let markerPosition = new daum.maps.LatLng(36.349120, 127.297775);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '황돈이  ' +
+            '<a href="/api/menus/menu?name=황돈이" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function oddugi() {
+    let markerPosition = new daum.maps.LatLng(36.349421, 127.298211);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '오뚜기식당  ' +
+            '<a href="/api/menus/menu?name=오뚜기식당" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function gorae() {
+    let markerPosition = new daum.maps.LatLng(36.348566, 127.298804);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '고래떡볶이  ' +
+            '<a href="/api/menus/menu?name=고래떡볶이" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function bongus() {
+    let markerPosition = new daum.maps.LatLng(36.348677, 127.299723);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '봉구스밥버거  ' +
+            '<a href="/api/menus/menu?name=봉구스밥버거" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function mong() {
+    let markerPosition = new daum.maps.LatLng(36.348279, 127.300139);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '몽떡  ' +
+            '<a href="/api/menus/menu?name=몽떡" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function bongs() {
+    let markerPosition = new daum.maps.LatLng(36.349989, 127.297860);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '봉스키친  ' +
+            '<a href="/api/menus/menu?name=봉스키친" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function hakata() {
+    let markerPosition = new daum.maps.LatLng(36.349464, 127.298852);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '하카타  ' +
+            '<a href="/api/menus/menu?name=하카타" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function sushi() {
+    let markerPosition = new daum.maps.LatLng(36.349356, 127.298396);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '스시킴  ' +
+            '<a href="/api/menus/menu?name=스시킴" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function bonita() {
+    let markerPosition = new daum.maps.LatLng(36.348286, 127.300132);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '보니타  ' +
+            '<a href="/api/menus/menu?name=보니타" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function thecook() {
+    let markerPosition = new daum.maps.LatLng(36.349309, 127.297810);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '더쿡  ' +
+            '<a href="/api/menus/menu?name=더쿡" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function salt() {
+    let markerPosition = new daum.maps.LatLng(36.349339, 127.297287);
+    let marker = new daum.maps.Marker({
+      position: markerPosition
+    });
+    markers.push(marker);
+    marker.setMap(map);
+    let iwContent = '<div style="padding:5px; color:black; font-size: 2rem;">' +
+            '솔트앤페퍼  ' +
+            '<a href="/api/menus/menu?name=솔트앤페퍼" charset="UTF-8" style="text-decoration: none; color:black">' +
+            '<i class="fa fa-home fa-1x sr-contact"></i></a></div>',
+        iwRemoveable = true;
+
+    let infowindow = new daum.maps.InfoWindow({
+      content: iwContent,
+      removable: iwRemoveable
+    });
+
+    infoWindows.push(infowindow);
+
+    daum.maps.event.addListener(marker, 'click', function () {
+      infowindow.open(map, marker);
+    });
+  }
+
+  function setNull() {
+    for (let i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
+      infoWindows[i].close();
+    }
+  }
+</script>
+<!-- jQuery -->
+<script src="/vendor/jquery/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<!-- Plugin JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+<script src="/vendor/scrollreveal/scrollreveal.min.js"></script>
+<script src="/vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+
+<!-- Theme JavaScript -->
+<script src="/js/creative.min.js"></script>
+
+</body>
+
+</html>
