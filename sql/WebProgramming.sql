@@ -1,9 +1,9 @@
 create table user(
-	u_no		integer		not null,
-    u_id		integer		not null,
-    password	varchar(20)	not null,
-    primary key(u_no),
-    unique key(u_id)
+u_no integer not null,
+u_id integer not null,
+password varchar(20) not null,
+primary key(u_no),
+unique key(u_id)
 );
 
 alter table user modify column u_no integer not null auto_increment;
@@ -20,10 +20,10 @@ insert into user(u_id, password) values(20142000, '1234');
 
 
 create table restaurant(
-	r_no		integer		not null,
-    r_name		varchar(20)	not null,
-    type		varchar(10)	not null,
-    primary key(r_no)
+r_no integer not null,
+r_name varchar(20) not null,
+type varchar(10) not null,
+primary key(r_no)
 );
 
 alter table restaurant modify column r_no integer not null auto_increment;
@@ -47,12 +47,12 @@ insert into restaurant(r_name, type) values('더쿡','양식');
 insert into restaurant(r_name, type) values('솔트앤페퍼','양식');
 
 create table menu(
-	m_no		integer		not null,
-    r_no		integer		not null,
-    m_name		varchar(20)	not null,
-    price		varchar(10)	not null,
-    primary key(m_no),
-    foreign key(r_no) references restaurant(r_no)
+m_no integer not null,
+r_no integer not null,
+m_name varchar(20) not null,
+price varchar(10) not null,
+primary key(m_no),
+foreign key(r_no) references restaurant(r_no)
 );
 
 alter table menu modify column m_no integer not null auto_increment;
@@ -152,12 +152,12 @@ insert into menu(r_no, m_name, price) values(12, 'BBQPorkRibs', '22,900');
 insert into menu(r_no, m_name, price) values(12, 'BBQPlates', '24,900');
 
 create table board(
-	b_no		integer		not null,
-    star		integer		not null,
-    subject		varchar(300)	not null,
-    u_id		integer		not null,
-    primary key(b_no),
-    foreign key(u_id)references user(u_id)
+b_no integer not null,
+star integer not null,
+subject varchar(300) not null,
+u_id integer not null,
+primary key(b_no),
+foreign key(u_id)references user(u_id)
 );
 
 alter table board modify column b_no integer not null auto_increment;
